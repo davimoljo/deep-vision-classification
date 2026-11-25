@@ -1,0 +1,95 @@
+% Seção 1 — Introdução. Não depende de resultados nem de decisões do grupo.
+% Para colar no template LaTeX do professor; citações em referencias.bib.
+
+\section{Introdução}
+
+A classificação de imagens consiste em atribuir a uma imagem um rótulo entre um
+conjunto finito de categorias. Embora seja uma tarefa trivial para humanos, ela
+é difícil de resolver com regras explícitas: um mesmo objeto aparece sob
+diferentes pontos de vista, escalas, iluminações, oclusões e fundos, e
+categorias distintas podem compartilhar formas e texturas. Abordagens clássicas
+dependiam de descritores projetados manualmente seguidos de um classificador,
+de modo que a qualidade do sistema ficava limitada pela qualidade das
+características escolhidas pelo projetista.
+
+As redes neurais convolucionais (CNNs) mudaram esse cenário ao aprender as
+características diretamente dos dados~\cite{lecun1998gradient}. Três
+propriedades as tornam adequadas a imagens: a conectividade local, que explora
+a correlação entre pixels vizinhos; o compartilhamento de pesos, que reduz o
+número de parâmetros e torna a detecção de um padrão independente de sua
+posição; e o empilhamento de camadas com \textit{pooling}, que constrói uma
+hierarquia de representações, de bordas e texturas nas primeiras camadas a
+partes de objetos nas mais profundas. O resultado da AlexNet na competição
+ImageNet de 2012~\cite{krizhevsky2012imagenet} consolidou as CNNs como a
+abordagem dominante, e arquiteturas posteriores, como a
+VGG~\cite{simonyan2015very} e a ResNet~\cite{he2016deep}, mostraram que
+profundidade, uso de \textit{kernels} pequenos e conexões residuais têm papel
+decisivo no desempenho. Componentes como \textit{Batch
+Normalization}~\cite{ioffe2015batch} e \textit{Dropout}~\cite{srivastava2014dropout}
+tornaram o treinamento de redes profundas mais estável e menos sujeito a
+\textit{overfitting}.
+
+Este trabalho utiliza o CIFAR-10~\cite{krizhevsky2009learning}, um conjunto de
+60.000 imagens coloridas de $32 \times 32$ pixels divididas igualmente em dez
+classes (avião, automóvel, pássaro, gato, cervo, cachorro, sapo, cavalo, navio
+e caminhão), com 50.000 imagens de treinamento e 10.000 de teste. A baixa
+resolução e a semelhança visual entre algumas classes, como gato e cachorro ou
+automóvel e caminhão, tornam o problema desafiador, enquanto o tamanho moderado
+do conjunto permite treinar e comparar várias configurações de rede com
+recursos computacionais limitados. Essas características fazem do CIFAR-10 um
+\textit{benchmark} adequado para estudar experimentalmente o efeito de
+decisões de projeto de uma CNN.
+
+Treinar uma CNN profunda do zero exige muitos dados rotulados e tempo de
+processamento. O \textit{transfer learning}~\cite{pan2010survey} contorna essa
+limitação reaproveitando uma rede pré-treinada em um conjunto grande e
+genérico, tipicamente o ImageNet~\cite{deng2009imagenet}, com cerca de
+1,2 milhão de imagens em 1.000 classes. Como as primeiras camadas aprendem
+características gerais e as últimas, características mais específicas da tarefa
+original~\cite{yosinski2014transferable}, é possível manter parte da rede
+congelada e adaptar apenas as camadas finais ou, alternativamente, ajustar a
+rede inteira (\textit{fine-tuning}). A escolha entre essas estratégias envolve
+um compromisso entre desempenho, custo computacional e risco de
+\textit{overfitting}, e a diferença de domínio entre ImageNet e CIFAR-10
+(em especial a resolução) torna essa escolha uma questão experimental.
+
+\subsection{Objetivos}
+
+O objetivo deste trabalho é estudar experimentalmente o uso de CNNs para a
+classificação do CIFAR-10, em duas frentes: o projeto de uma arquitetura
+própria e o uso de redes pré-treinadas por meio de \textit{transfer learning}.
+Especificamente, busca-se:
+
+\begin{itemize}
+  \item desenvolver uma CNN própria (\textit{baseline}) e avaliar o impacto de
+        modificações arquiteturais controladas, alterando uma característica
+        por vez;
+  \item analisar a relação entre a complexidade das redes (número de
+        parâmetros, tempo de treinamento e de inferência) e seu desempenho;
+  \item aplicar \textit{transfer learning} com arquiteturas da literatura
+        pré-treinadas no ImageNet, comparando diferentes estratégias de
+        congelamento e descongelamento de camadas;
+  \item comparar as melhores configurações de cada abordagem no conjunto de
+        teste, analisando o desempenho por classe e os principais erros de
+        classificação.
+\end{itemize}
+
+As principais questões investigadas são:
+\begin{enumerate}
+  \item Quais alterações na arquitetura da CNN própria produzem maior impacto
+        no desempenho e no \textit{overfitting}?
+  \item Aumentar a capacidade da rede melhora o desempenho, e a que custo
+        computacional?
+  \item Os modelos pré-treinados apresentam vantagem em relação à CNN própria?
+  \item Como o congelamento ou o descongelamento de camadas afeta o desempenho
+        do \textit{transfer learning}?
+  \item Quais classes são mais difíceis de classificar e quais são mais
+        frequentemente confundidas entre si?
+\end{enumerate}
+
+% TODO GRUPO: parágrafo final com a organização do texto (ajustar se o
+% template já tiver as seções com outros nomes).
+O restante do texto está organizado da seguinte forma: a
+Seção~\ref{sec:metodos} descreve os materiais e métodos; a
+Seção~\ref{sec:resultados} apresenta e discute os resultados; a
+Seção~\ref{sec:conclusao} apresenta as conclusões.

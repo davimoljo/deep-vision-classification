@@ -1,0 +1,7 @@
+torch>=2.2
+torchvision>=0.17
+numpy
+scikit-learn
+pandas
+matplotlib
+jinja2  # usado por DataFrame.to_latex

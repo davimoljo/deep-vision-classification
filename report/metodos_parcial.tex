@@ -1,0 +1,100 @@
+% Seção 2 — Materiais e métodos (PARCIAL).
+% Contém apenas o que já está fixado pelo enunciado e pelo código em src/.
+% Trechos marcados com "TODO GRUPO" dependem de decisões ainda em aberto.
+
+\section{Materiais e métodos}
+\label{sec:metodos}
+
+\subsection{Conjunto de dados e divisão}
+
+O CIFAR-10~\cite{krizhevsky2009learning} fornece 50.000 imagens de treinamento
+e 10.000 de teste, balanceadas entre as dez classes. O conjunto de treinamento
+original foi dividido uma única vez em 45.000 imagens para treinamento e 5.000
+para validação, de forma estratificada (500 imagens de cada classe na
+validação), com semente fixa (42). Os índices resultantes foram salvos em
+arquivo e versionados no repositório, de modo que todos os experimentos usam
+exatamente a mesma divisão. As 10.000 imagens de teste permaneceram separadas
+durante todo o desenvolvimento e foram utilizadas apenas na avaliação final
+das configurações selecionadas pela validação.
+
+\subsection{Pré-processamento e \textit{data augmentation}}
+
+As imagens são convertidas para tensores com valores em $[0, 1]$ e
+normalizadas canal a canal com a média $(0{,}4914;\ 0{,}4822;\ 0{,}4465)$ e o
+desvio padrão $(0{,}2470;\ 0{,}2435;\ 0{,}2616)$ do conjunto de treinamento do
+CIFAR-10. Apenas no treinamento são aplicadas duas transformações de
+\textit{data augmentation}: recorte aleatório de $32 \times 32$ após
+\textit{padding} de 4 pixels, que simula pequenos deslocamentos do objeto, e
+espelhamento horizontal com probabilidade 0,5, válido porque nenhuma classe do
+CIFAR-10 muda de significado ao ser espelhada. Validação e teste não recebem
+\textit{augmentation}, para que a métrica de seleção não seja ruidosa.
+
+Para as redes pré-treinadas, as imagens são redimensionadas para
+$224 \times 224$ pixels, a resolução de entrada usada no pré-treinamento no
+ImageNet. O recorte e o espelhamento são aplicados antes do redimensionamento,
+de forma que a \textit{augmentation} seja equivalente à da CNN própria.
+% TODO GRUPO: se decidirem usar a média/desvio do ImageNet no transfer
+% learning, ajustar este parágrafo.
+
+\subsection{Arquitetura \textit{baseline} e modificações}
+% TODO GRUPO: descrever a baseline escolhida (camadas, filtros, kernels,
+% ativações, pooling, FC, BN/Dropout, nº total de parâmetros) e listar as
+% ablações efetivamente realizadas, com a justificativa de cada uma.
+\textbf{[A definir pelo grupo.]}
+
+\subsection{\textit{Transfer learning}}
+
+As redes pré-treinadas utilizam os pesos do ImageNet disponibilizados pelo
+\texttt{torchvision}, com a última camada substituída por uma camada linear de
+dez saídas. Foram consideradas três estratégias:
+\begin{itemize}
+  \item \textbf{congelada}: todo o \textit{backbone} é mantido fixo e apenas a
+        nova camada de saída é treinada. As camadas de \textit{Batch
+        Normalization} congeladas permanecem em modo de avaliação, para que
+        suas estatísticas do ImageNet não sejam alteradas durante o
+        treinamento;
+  \item \textbf{parcial}: além do classificador, o último estágio
+        convolucional é descongelado (por exemplo, \texttt{layer4} na
+        ResNet);
+  \item \textbf{completa}: todos os pesos são ajustados (\textit{fine-tuning}).
+\end{itemize}
+% TODO GRUPO: arquiteturas escolhidas, estratégias efetivamente usadas,
+% camadas descongeladas na estratégia parcial de cada uma e, se houver,
+% a comparação com treinamento do zero.
+
+\subsection{Treinamento}
+% TODO GRUPO: confirmar os valores (src/pipeline.py, DEFAULTS) e justificar.
+Todos os modelos são treinados com entropia cruzada como função de perda.
+\textbf{[A confirmar pelo grupo:]} otimizador AdamW~\cite{loshchilov2019decoupled},
+taxa de aprendizado inicial $10^{-3}$, \textit{weight decay} $5 \times 10^{-4}$,
+\textit{batch} de 128 imagens e redução da taxa de aprendizado por cosseno
+(\textit{cosine annealing})~\cite{loshchilov2017sgdr}. Os hiperparâmetros são
+mantidos constantes entre as configurações comparadas. Em cada treinamento,
+mantêm-se os pesos da época com maior acurácia de validação.
+
+\subsection{Métricas e protocolo experimental}
+
+A métrica principal é a acurácia. Para cada configuração também são
+registrados: as curvas de perda e de acurácia de treinamento e de validação a
+cada época, usadas para diagnosticar \textit{overfitting} e
+\textit{underfitting}; o número total de parâmetros e o número de parâmetros
+treináveis; o tempo de treinamento; e o tempo de inferência por imagem,
+medido após passadas de aquecimento descartadas e com sincronização da GPU.
+Para as configurações finais, calculam-se a matriz de confusão normalizada no
+conjunto de teste, a acurácia por classe e a classe com que cada uma é mais
+confundida.
+
+O protocolo é o seguinte: (i) todas as configurações são treinadas no conjunto
+de treinamento e comparadas pela acurácia de validação; (ii) seleciona-se a
+melhor configuração da CNN própria e a melhor estratégia de cada arquitetura
+pré-treinada; (iii) somente essas configurações são avaliadas, uma única vez,
+no conjunto de teste. Todas as fontes de aleatoriedade (Python, NumPy e
+PyTorch) são inicializadas com a semente 42, e os hiperparâmetros e resultados
+de cada execução são salvos em arquivos JSON no repositório.
+
+\subsection{\textit{Hardware} e \textit{software}}
+% TODO GRUPO: GPU usada (o JSON de cada run registra o nome do dispositivo),
+% versões de Python/PyTorch/torchvision e link do repositório.
+Os experimentos foram implementados em Python com PyTorch e torchvision.
+\textbf{[GPU e versões a preencher.]} O código está disponível em
+\url{https://github.com/davimoljo/deep-vision-classification}.
