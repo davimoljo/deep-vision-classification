@@ -48,8 +48,10 @@ GPU**. Seu computador não treina nada.
    **New Colab Server**.
 3. Faça login com sua conta Google quando o navegador abrir e clique em
    **Allow**.
-4. Escolha uma máquina com **GPU (T4)**. Para conferir, rode `!nvidia-smi`
-   numa célula.
+4. Escolha uma máquina com **GPU (T4)**. Sem GPU o treino roda na CPU e fica
+   mais de 10x mais lento (a baseline levou ~3 h em vez de ~15 min). A célula
+   de Setup para com erro se o servidor não tiver GPU: nesse caso, use
+   **Colab: Remove Server** e crie outro escolhendo a T4.
 
 ### 3. Montar o Google Drive (recomendado)
 
@@ -63,6 +65,27 @@ notebook 04 precisa dos pesos.
 
 Se o Drive não montar, a célula de Setup avisa. Ainda dá para rodar, mas
 baixe os resultados antes de fechar o servidor (veja o passo 5).
+
+Na primeira vez, o Setup baixa o CIFAR-10 (~15 min) e guarda uma cópia em
+`MyDrive/deep-vision-classification/data/`. Nas próximas vezes, ele copia do
+Drive em segundos.
+
+#### Pasta compartilhada do grupo (obrigatório para o notebook 04)
+
+Cada run salva na pasta `deep-vision-classification` do Drive **de quem rodou**.
+O notebook 04 procura todas as runs numa pasta só, então o grupo precisa usar a
+mesma pasta:
+
+1. Uma pessoa (a dona) cria `deep-vision-classification` no próprio Drive (ou
+   roda o Setup uma vez) e compartilha a pasta com os outros como **Editor**.
+2. Cada um dos outros vai em **Compartilhados comigo**, clica com o botão
+   direito na pasta → **Organizar → Adicionar atalho** → **Meu Drive**.
+3. Com o atalho em `Meu Drive`, o caminho no Colab fica igual para todos
+   (`/content/drive/MyDrive/deep-vision-classification`) e tudo vai para a
+   mesma pasta.
+
+Ninguém pode ter uma pasta própria com o mesmo nome em `Meu Drive`; se tiver,
+renomeie antes de adicionar o atalho.
 
 ### 4. Rodar
 
